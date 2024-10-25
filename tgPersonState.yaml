@@ -1,0 +1,294 @@
+blueprint:
+  name: Erweiterter Personenstatus
+  domain: automation
+  description: Stellt eine Entitität mit einem konfigurierbaren Status zur Verfügung 
+  input:
+    linked_person:
+      name: verknüpfte Person
+      selector:
+        entity:
+          multiple: false
+          filter:
+            domain: person
+    linked_activitybutton:
+      name: aktiv
+      selector:
+        entity:
+          multiple: false
+          filter:
+            domain: input_boolean
+    linked_field:
+      name: verknüpftes Statusfeld
+      selector:
+        entity:
+          multiple: false
+          filter:
+            domain: input_text
+    status_1:
+      name: Status 1
+      icon: mdi:cog
+      collapsed: true
+      description: Konfiguration Status 1
+      input:  
+        status_1_name:
+          name: "Status"
+          default:
+        status_1_basisstatus:
+          name: "Basisstatus"
+          default:
+        status_1_linked_devices:
+          name: verknüpfte Geräte
+          default: "-"
+          selector:
+            entity:
+              multiple: true          
+              filter:
+                domain: 
+                  - device_tracker
+                  - binary_sensor
+        status_1_schedule:
+          name: Zeitplan Status 
+          default: "-"
+          selector:
+            entity:
+              filter:
+                domain: schedule
+    status_2:
+      name: Status 2
+      icon: mdi:cog
+      collapsed: true
+      description: Konfiguration Status 2
+      input:  
+        status_2_name:
+          name: "Status"
+          default:
+        status_2_basisstatus:
+          name: "Basisstatus"
+          default:
+        status_2_linked_devices:
+          name: verknüpfte Geräte
+          default: "-"
+          selector:
+            entity:
+              multiple: true          
+              filter:
+                domain: 
+                  - device_tracker
+                  - binary_sensor
+        status_2_schedule:
+          name: Zeitplan Status 
+          default: "-"
+          selector:
+            entity:
+              filter:
+                domain: schedule
+    status_3:
+      name: Status 3
+      icon: mdi:cog
+      collapsed: true
+      description: Konfiguration Status 3
+      input:  
+        status_3_name:
+          name: "Status"
+          default:
+        status_3_basisstatus:
+          name: "Basisstatus"
+          default:
+        status_3_linked_devices:
+          name: verknüpfte Geräte
+          default: "-"
+          selector:
+            entity:
+              multiple: true          
+              filter:
+                domain: 
+                  - device_tracker
+                  - binary_sensor
+        status_3_schedule:
+          name: Zeitplan Status 
+          default: "-"
+          selector:
+            entity:
+              filter:
+                domain: schedule
+    status_4:
+      name: Status 4
+      icon: mdi:cog
+      collapsed: true
+      description: Konfiguration Status 4
+      input:  
+        status_4_name:
+          name: "Status"
+          default:
+        status_4_basisstatus:
+          name: "Basisstatus"
+          default:
+        status_4_linked_devices:
+          name: verknüpfte Geräte
+          default: "-"
+          selector:
+            entity:
+              multiple: true          
+              filter:
+                domain: 
+                  - device_tracker
+                  - binary_sensor
+        status_4_schedule:
+          name: Zeitplan Status 
+          default: "-"
+          selector:
+            entity:
+              filter:
+                domain: schedule
+
+variables:
+  linked_person: !input linked_person
+  linked_field: !input linked_field
+  linked_activitybutton: !input linked_activitybutton
+  active_status: inactive
+
+  observable: [
+              {
+              'status': !input status_1_name,
+              'basisstatus': !input status_1_basisstatus,
+              'devices': !input status_1_linked_devices,
+              'schedule': !input status_1_schedule,
+              },
+              {
+              'status': !input status_2_name,
+              'basisstatus': !input status_2_basisstatus,
+              'devices': !input status_2_linked_devices,
+              'schedule': !input status_2_schedule,
+              },
+              {
+              'status': !input status_3_name,
+              'basisstatus': !input status_3_basisstatus,
+              'devices': !input status_3_linked_devices,
+              'schedule': !input status_3_schedule,
+              },
+              {
+              'status': !input status_4_name,
+              'basisstatus': !input status_4_basisstatus,
+              'devices': !input status_4_linked_devices,
+              'schedule': !input status_4_schedule,
+              },
+              ]
+  observed: >-
+    {%- macro observer(itemlist) -%}
+    {%- for item in itemlist -%}
+      {%- if item.status is defined and item.status and item.status != "-" -%}
+        {%- set test = item.schedule -%}
+        {%- if test and test != "-" and states(test) != 'unknown' -%}
+          {%- set ns.myEntities = ns.myEntities + [test]%}
+        {%- endif -%}
+        {%- set test = item.devices -%}
+        {%- if test and test is string and test != "-" and states(test) != 'unknown' -%}
+          {%- set ns.myEntities = ns.myEntities + [test]%}
+        {%- elif test and test is list -%}
+          {%- for device in test -%}
+            {%- if device and device != "-" and states(device) != 'unknown' -%}
+              {%- set ns.myEntities = ns.myEntities + [device]%}
+            {%- endif -%}
+          {%- endfor -%} 
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- endmacro -%}
+    {%- set ns = namespace(myEntities=[])%}
+    {%- set ns.myEntities = ns.myEntities + [linked_person]%}
+    {%- set status = observer(observable)  -%}
+    {{- ns.myEntities -}}
+
+  sendmessage: false
+
+
+trigger:
+  - platform: event
+    event_type: state_changed
+
+condition:
+
+  - condition: template
+    value_template: >-
+      {%- if trigger.event.data.entity_id in observed -%}true{%- endif -%}
+
+action:
+  - variables:
+      test: >-
+        {%- if trigger.event.data.entity_id in observed -%}true{%- endif -%}
+      my_status: >-
+        {%- macro getStatus(item, person, isActive) -%}
+          {%- set tmp = namespace(isError = false) -%}   
+          {%- set stat = namespace(stat = "-") -%}   
+          {%- set test = states(isActive) -%}
+          {%- if test != "on" -%}
+            {%- set tmp.isError = true -%}  
+            {%- set stat.stat = "inactive" -%}  
+          {%- endif -%}
+          {# Test BasisStatus#}
+          {%- if item.basisstatus -%}
+            {%- set basestats = item.basisstatus.split(';') -%}
+            {%- if not states(person) in basestats -%} 
+              {% set tmp.isError = true %}  
+            {%- endif -%}
+          {%- endif -%}
+          {# Test Status is set#}
+          {%- if item.status is not defined or not item.status or item.status == "-" -%} 
+            {% set tmp.isError = true %}              
+          {%- endif -%}
+          {# Test schedule is not set or aktive #}
+          {%- if item.schedule is defined and item.schedule != "-" and states(item.schedule) != 'on' -%} 
+            {% set tmp.isError = true %}              
+          {%- endif -%}
+          {# Test devices is aktive #}
+          {%- if tmp.isError == false -%} 
+            {%- if item.devices and item.devices is string and item.devices != "-" -%}
+              {%- set test = [item.devices] -%}
+            {%- elif item.devices and item.devices is list -%}
+              {%- set test = item.devices -%}
+            {%- else -%}
+              {%- set test = [] -%}
+            {%- endif -%}
+            {%- for device in test -%}              
+              {%- if device and device != "-" -%}
+                {%- if states(device) == 'on' or states(device) == 'home' -%}
+                  {%- set stat.stat = item.status -%} 
+                  {%- break -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}            
+          {%- endif -%}
+          {%- if stat.stat != "-" -%} 
+            {{- stat.stat -}}
+          {%- endif -%}
+
+        {%- endmacro -%}
+        {#-------------------------------------------#}
+        {%- set mystatus = namespace(stat=states(linked_person)) -%}
+        {%- for line in observable -%}
+          {%- set status = getStatus(line, linked_person, linked_activitybutton)  -%}
+          {%- if status is defined and status -%} 
+            {%- set mystatus.stat = status  -%} 
+          {%- endif -%}
+        {%- endfor -%} 
+        {{- mystatus.stat -}}
+ 
+  - if:
+      - condition: template
+        value_template: "{{states(linked_field) != my_status}}"
+    then:
+      - action: input_text.set_value
+        metadata: {}
+        data:
+          value: "{{my_status}}"
+        target:
+          entity_id: "{{linked_field}}"
+  - condition: template
+    value_template: "{{sendmessage}}"      
+  - action: notify.persistent_notification
+    metadata: {}
+    data:
+      message: "{{test}} {{observed|join}} {{domain_linked_field}} {{trigger.event.data.entity_id}}"      
+mode: single
+
+
