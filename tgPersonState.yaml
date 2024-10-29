@@ -179,15 +179,15 @@ variables:
       {%- if item.status is defined and item.status and item.status != "-" -%}
         {%- set test = item.schedule -%}
         {%- if test and test != "-" and states(test) != 'unknown' -%}
-          {%- set ns.myEntities = ns.myEntities + [test]%}
+          {%- set ns.myEntities = ns.myEntities + [test] -%}
         {%- endif -%}
         {%- set test = item.devices -%}
         {%- if test and test is string and test != "-" and states(test) != 'unknown' -%}
-          {%- set ns.myEntities = ns.myEntities + [test]%}
+          {%- set ns.myEntities = ns.myEntities + [test] -%}
         {%- elif test and test is list -%}
           {%- for device in test -%}
             {%- if device and device != "-" and states(device) != 'unknown' -%}
-              {%- set ns.myEntities = ns.myEntities + [device]%}
+              {%- set ns.myEntities = ns.myEntities + [device] -%}
             {%- endif -%}
           {%- endfor -%} 
         {%- endif -%}
@@ -195,7 +195,8 @@ variables:
     {%- endfor -%}
     {%- endmacro -%}
     {%- set ns = namespace(myEntities=[])%}
-    {%- set ns.myEntities = ns.myEntities + [linked_person]%}
+    {%- set ns.myEntities = ns.myEntities + [linked_person] + [linked_activitybutton]%}
+
     {%- set status = observer(observable)  -%}
     {{- ns.myEntities -}}
 
@@ -205,17 +206,23 @@ variables:
 trigger:
   - platform: event
     event_type: state_changed
+  - platform: state
+    entity_id: input_boolean.reloadconfig
+    from: "on"
+    to: "off"
+    id: "reloadConfig"
 
 condition:
-
-  - condition: template
-    value_template: >-
-      {%- if trigger.event.data.entity_id in observed -%}true{%- endif -%}
+  - condition: or
+    conditions:
+      - condition: trigger
+        id:
+          - reloadConfig
+      - condition: template
+        value_template: " {%- if trigger.event.data.entity_id in observed -%}true{%- endif -%}"
 
 action:
   - variables:
-      test: >-
-        {%- if trigger.event.data.entity_id in observed -%}true{%- endif -%}
       my_status: >-
         {%- macro getStatus(item, person, isActive) -%}
           {%- set tmp = namespace(isError = false) -%}   
@@ -265,13 +272,14 @@ action:
         {%- endmacro -%}
         {#-------------------------------------------#}
         {%- set mystatus = namespace(stat=states(linked_person)) -%}
+        {%- set name = state_attr(linked_person, "friendly_name")  -%}
         {%- for line in observable -%}
           {%- set status = getStatus(line, linked_person, linked_activitybutton)  -%}
           {%- if status is defined and status -%} 
             {%- set mystatus.stat = status  -%} 
           {%- endif -%}
         {%- endfor -%} 
-        {{- mystatus.stat -}}
+        {{- name~"!"~mystatus.stat -}}
  
   - if:
       - condition: template
