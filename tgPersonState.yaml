@@ -1,43 +1,68 @@
 blueprint:
-  name: Erweiterter Personenstatus
+  name: Extened person state
   domain: automation
-  description: Stellt eine Entitität mit einem konfigurierbaren Status zur Verfügung 
+  description: >-
+    Provides a text entity with a configurable state.<br>The configured state conditions are checked in turn and the last one that is true is returned
   input:
+    debugmode:
+      name: "debug mode"
+      description: Configuration
+      default: false
+      selector:
+        boolean:
+
     linked_person:
-      name: verknüpfte Person
+      name: Person entity [mandatory]
+      description: a person entity, preferably linked to a tracker
       selector:
         entity:
           multiple: false
           filter:
             domain: person
     linked_activitybutton:
-      name: aktiv
+      name: is activ button [optional]
+      description: a Boolean helper that indicates whether the person's state is tracked by this blueprint
+      default: "-"
       selector:
         entity:
           multiple: false
           filter:
             domain: input_boolean
     linked_field:
-      name: verknüpftes Statusfeld
+      name: state text-entity [optional]
+      description: The determined status is written into this text entity
+      default: "-"
       selector:
         entity:
           multiple: false
           filter:
             domain: input_text
+    addPersonName:
+      name: add person name to state [default = false]
+      description: if true, the state text in textfield starts with the username<br>e.g. user!home 
+      default: false
+      selector:
+        boolean:
+
+
+
     status_1:
-      name: Status 1
+      name: state 1 [optional]
       icon: mdi:cog
       collapsed: true
-      description: Konfiguration Status 1
+      description: Configuration state
       input:  
         status_1_name:
-          name: "Status"
+          name: State [optional]
+          description: if set, this will be returned as status as soon as at least one of the linked devices is true<br>e.g. homeoffice 
           default:
         status_1_basisstatus:
-          name: "Basisstatus"
+          name: refers to state [optional]
+          description: if set, the status is only set if the person entity has the status specified here<br>e.g. home
           default:
         status_1_linked_devices:
-          name: verknüpfte Geräte
+          name: devices [optional]
+          description: linked devices (trackers or binary sensors) that provides an on/off state  
           default: "-"
           selector:
             entity:
@@ -47,26 +72,30 @@ blueprint:
                   - device_tracker
                   - binary_sensor
         status_1_schedule:
-          name: Zeitplan Status 
+          name: Schedule [optional]
+          description: If set, the state will only be set when the schedule is enabled
           default: "-"
           selector:
             entity:
               filter:
                 domain: schedule
     status_2:
-      name: Status 2
+      name: state 2 [optional]
       icon: mdi:cog
       collapsed: true
-      description: Konfiguration Status 2
+      description: Configuration state
       input:  
         status_2_name:
-          name: "Status"
+          name: State [optional]
+          description: if set, this will be returned as status as soon as at least one of the linked devices is true<br>e.g. homeoffice 
           default:
         status_2_basisstatus:
-          name: "Basisstatus"
+          name: refers to state [optional]
+          description: if set, the status is only set if the person entity has the status specified here<br>e.g. home
           default:
         status_2_linked_devices:
-          name: verknüpfte Geräte
+          name: devices [optional]
+          description: linked devices (trackers or binary sensors) that provides an on/off state  
           default: "-"
           selector:
             entity:
@@ -76,26 +105,30 @@ blueprint:
                   - device_tracker
                   - binary_sensor
         status_2_schedule:
-          name: Zeitplan Status 
+          name: Schedule [optional]
+          description: If set, the state will only be set when the schedule is enabled
           default: "-"
           selector:
             entity:
               filter:
                 domain: schedule
     status_3:
-      name: Status 3
+      name: state 3 [optional]
       icon: mdi:cog
       collapsed: true
-      description: Konfiguration Status 3
+      description: Configuration state
       input:  
         status_3_name:
-          name: "Status"
+          name: State [optional]
+          description: if set, this will be returned as status as soon as at least one of the linked devices is true<br>e.g. homeoffice 
           default:
         status_3_basisstatus:
-          name: "Basisstatus"
+          name: refers to state [optional]
+          description: if set, the status is only set if the person entity has the status specified here<br>e.g. home
           default:
         status_3_linked_devices:
-          name: verknüpfte Geräte
+          name: devices [optional]
+          description: linked devices (trackers or binary sensors) that provides an on/off state  
           default: "-"
           selector:
             entity:
@@ -105,26 +138,31 @@ blueprint:
                   - device_tracker
                   - binary_sensor
         status_3_schedule:
-          name: Zeitplan Status 
+          name: Schedule [optional]
+          description: If set, the state will only be set when the schedule is enabled
           default: "-"
           selector:
             entity:
               filter:
                 domain: schedule
+
     status_4:
-      name: Status 4
+      name: state 4 [optional]
       icon: mdi:cog
       collapsed: true
-      description: Konfiguration Status 4
+      description: Configuration state
       input:  
         status_4_name:
-          name: "Status"
+          name: State [optional]
+          description: if set, this will be returned as status as soon as at least one of the linked devices is true<br>e.g. homeoffice 
           default:
         status_4_basisstatus:
-          name: "Basisstatus"
+          name: refers to state [optional]
+          description: if set, the status is only set if the person entity has the status specified here<br>e.g. home
           default:
         status_4_linked_devices:
-          name: verknüpfte Geräte
+          name: devices [optional]
+          description: linked devices (trackers or binary sensors) that provides an on/off state  
           default: "-"
           selector:
             entity:
@@ -134,18 +172,60 @@ blueprint:
                   - device_tracker
                   - binary_sensor
         status_4_schedule:
-          name: Zeitplan Status 
+          name: Schedule [optional]
+          description: If set, the state will only be set when the schedule is enabled
+          default: "-"
+          selector:
+            entity:
+              filter:
+                domain: schedule
+    status_5:
+      name: state 5 [optional]
+      icon: mdi:cog
+      collapsed: true
+      description: Configuration state
+      input:  
+        status_5_name:
+          name: State [optional]
+          description: if set, this will be returned as status as soon as at least one of the linked devices is true<br>e.g. homeoffice 
+          default:
+        status_5_basisstatus:
+          name: refers to state [optional]
+          description: if set, the status is only set if the person entity has the status specified here<br>e.g. home
+          default:
+        status_5_linked_devices:
+          name: devices [optional]
+          description: linked devices (trackers or binary sensors) that provides an on/off state  
+          default: "-"
+          selector:
+            entity:
+              multiple: true          
+              filter:
+                domain: 
+                  - device_tracker
+                  - binary_sensor
+        status_5_schedule:
+          name: Schedule [optional]
+          description: If set, the state will only be set when the schedule is enabled
           default: "-"
           selector:
             entity:
               filter:
                 domain: schedule
 
+
+
+
 variables:
+
   linked_person: !input linked_person
   linked_field: !input linked_field
   linked_activitybutton: !input linked_activitybutton
+  addPersonName: !input addPersonName
+  debugmode: !input debugmode
+  debugMsg: ""
   active_status: inactive
+
 
   observable: [
               {
@@ -172,6 +252,12 @@ variables:
               'devices': !input status_4_linked_devices,
               'schedule': !input status_4_schedule,
               },
+              {
+              'status': !input status_5_name,
+              'basisstatus': !input status_5_basisstatus,
+              'devices': !input status_5_linked_devices,
+              'schedule': !input status_5_schedule,
+              }
               ]
   observed: >-
     {%- macro observer(itemlist) -%}
@@ -200,7 +286,7 @@ variables:
     {%- set status = observer(observable)  -%}
     {{- ns.myEntities -}}
 
-  sendmessage: false
+  sendmessage: true
 
 
 trigger:
@@ -278,9 +364,12 @@ action:
           {%- if status is defined and status -%} 
             {%- set mystatus.stat = status  -%} 
           {%- endif -%}
-        {%- endfor -%} 
-        {{- name~"!"~mystatus.stat -}}
- 
+        {%- endfor -%}
+        {%- if addPersonName is defined and addPersonName -%}
+          {{- name~"!"~mystatus.stat -}}
+        {%- else -%}  
+          {{- mystatus.stat -}}
+        {%- endif -%}
   - if:
       - condition: template
         value_template: "{{states(linked_field) != my_status}}"
@@ -291,12 +380,23 @@ action:
           value: "{{my_status}}"
         target:
           entity_id: "{{linked_field}}"
-  - condition: template
-    value_template: "{{sendmessage}}"      
-  - action: notify.persistent_notification
-    metadata: {}
-    data:
-      message: "{{test}} {{observed|join}} {{domain_linked_field}} {{trigger.event.data.entity_id}}"      
+  - if:
+      - condition: template
+        value_template: "{{debugmode}}"
+    then:
+      - variables:
+          debugMsg: >-
+            {{debugMsg ~ "h,pte"}}
+      - action: notify.persistent_notification
+        metadata: {}
+        data:
+          title: "Debug TgPersonState"
+          message: >-
+            {{debugMsg}}
+            <hr>triggered by: <ul><li>{%- if "id" in trigger -%}{{- trigger["id"] }}{%- endif %} [<i>{%- if "entity_id" in trigger -%}{{- trigger["entity_id"] }}{%- else -%}{{- trigger -}}{%- endif -%}</i>]</li></ul>
+
+
+
 mode: single
 
 
