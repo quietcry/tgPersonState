@@ -11,5 +11,5 @@ For various reasons, I wanted to define my home state more precisely, depending 
 **The blueprint is certainly not fully developed and probably contains errors**   
 **Before you boldly import and use the blueprint, a backup certainly makes sense!**   
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fquietcry%2FtgPersonState%2Fblob%2F09539fd1af9e55f1c1d29c87956c7e94d8b8f5ca%2FtgPersonState.yaml)
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fquietcry%2FtgPersonState%2Fblob%2Fd6554f8a5ce196e21cb3d08b6e300f7f545136e3%2FtgPersonState.yaml)
 
